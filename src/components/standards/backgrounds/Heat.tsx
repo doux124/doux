@@ -4,6 +4,7 @@ interface MousePosition {
   x: number;
   y: number;
   isDown: boolean;
+  isWithinBounds: boolean; // New property
   trail: TrailPoint[];
 }
 
@@ -31,16 +32,17 @@ interface Dimensions {
 
 const Heat: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null); // New ref for container
   const animationRef = useRef<number | null>(null);
-  const mouseRef = useRef<MousePosition>({ x: 0, y: 0, isDown: false, trail: [] });
+  const mouseRef = useRef<MousePosition>({ x: 0, y: 0, isDown: false, isWithinBounds: false, trail: [] });
   const heatMapRef = useRef<HeatMap | null>(null);
   const [dimensions, setDimensions] = useState<Dimensions>({ width: 0, height: 0 });
   
-  const RESOLUTION = 3; // Heat map resolution (lower = higher quality)
-  const COOLING_RATE = 0.98; // How fast heat dissipates
-  const DIFFUSION_RATE = 0.15; // How fast heat spreads
-  const MOUSE_HEAT = 100; // Heat intensity from mouse
-  const AMBIENT_TEMP = 0; // Background temperature
+  const RESOLUTION = 3;
+  const COOLING_RATE = 0.98;
+  const DIFFUSION_RATE = 0.15;
+  const MOUSE_HEAT = 100;
+  const AMBIENT_TEMP = 0;
 
   // Initialize heat map
   useEffect(() => {
@@ -80,40 +82,74 @@ const Heat: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Mouse tracking with trail
+  // Check if mouse is within canvas bounds
+  const isMouseWithinBounds = (clientX: number, clientY: number): boolean => {
+    if (!containerRef.current) return false;
+    
+    const rect = containerRef.current.getBoundingClientRect();
+    return (
+      clientX >= rect.left &&
+      clientX <= rect.right &&
+      clientY >= rect.top &&
+      clientY <= rect.bottom
+    );
+  };
+
+  // Mouse tracking with boundary detection
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent): void => {
-      const newPos: TrailPoint = { x: e.clientX, y: e.clientY, time: Date.now() };
+      const canvas = canvasRef.current;
+      if (!canvas) return;
       
-      mouseRef.current.x = e.clientX;
-      mouseRef.current.y = e.clientY;
+      const rect = canvas.getBoundingClientRect();
+      const canvasX = e.clientX - rect.left;
+      const canvasY = e.clientY - rect.top;
       
-      // Add to trail
-      mouseRef.current.trail.push(newPos);
+      mouseRef.current.x = canvasX;
+      mouseRef.current.y = canvasY;
+      mouseRef.current.isWithinBounds = isMouseWithinBounds(e.clientX, e.clientY);
       
-      // Limit trail length and remove old points
-      const now = Date.now();
-      mouseRef.current.trail = mouseRef.current.trail
-        .filter(point => now - point.time < 1000) // Keep trail for 1 second
-        .slice(-50); // Max 50 points
+      // Only add to trail if within bounds
+      if (mouseRef.current.isWithinBounds) {
+        // Store CANVAS coordinates instead of global coordinates
+        const newPos: TrailPoint = { x: canvasX, y: canvasY, time: Date.now() };
+        mouseRef.current.trail.push(newPos);
+        
+        // Limit trail length and remove old points
+        const now = Date.now();
+        mouseRef.current.trail = mouseRef.current.trail
+          .filter(point => now - point.time < 1000)
+          .slice(-50);
+      }
     };
 
-    const handleMouseDown = (): void => {
-      mouseRef.current.isDown = true;
+    const handleMouseDown = (e: MouseEvent): void => {
+      // Only register mouse down if within bounds
+      if (isMouseWithinBounds(e.clientX, e.clientY)) {
+        mouseRef.current.isDown = true;
+      }
     };
 
     const handleMouseUp = (): void => {
       mouseRef.current.isDown = false;
     };
 
+    const handleMouseLeave = (): void => {
+      // Clear mouse state when leaving the window entirely
+      mouseRef.current.isWithinBounds = false;
+      mouseRef.current.isDown = false;
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseleave', handleMouseLeave);
     
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, []);
 
@@ -134,61 +170,64 @@ const Heat: React.FC = () => {
 
       const { grid, cols, rows } = heatMapRef.current;
 
-      // Apply heat from mouse position and trail
-      const mouseGridX = Math.floor(mouseRef.current.x / RESOLUTION);
-      const mouseGridY = Math.floor(mouseRef.current.y / RESOLUTION);
-      
-      // Main mouse heat source
-      if (mouseGridX >= 0 && mouseGridX < cols && mouseGridY >= 0 && mouseGridY < rows) {
-        const heatRadius = mouseRef.current.isDown ? 8 : 4;
-        const heatIntensity = mouseRef.current.isDown ? MOUSE_HEAT * 1.5 : MOUSE_HEAT;
+      // Only apply heat if mouse is within bounds
+      if (mouseRef.current.isWithinBounds) {
+        const mouseGridX = Math.floor(mouseRef.current.x / RESOLUTION);
+        const mouseGridY = Math.floor(mouseRef.current.y / RESOLUTION);
         
-        for (let dy = -heatRadius; dy <= heatRadius; dy++) {
-          for (let dx = -heatRadius; dx <= heatRadius; dx++) {
-            const x = mouseGridX + dx;
-            const y = mouseGridY + dy;
-            
-            if (x >= 0 && x < cols && y >= 0 && y < rows) {
-              const distance = Math.sqrt(dx * dx + dy * dy);
-              if (distance <= heatRadius) {
-                const falloff = Math.max(0, (heatRadius - distance) / heatRadius);
-                const heatToAdd = heatIntensity * falloff * falloff; // Quadratic falloff
-                grid[y][x].temperature = Math.min(100, grid[y][x].temperature + heatToAdd);
-              }
-            }
-          }
-        }
-      }
-
-      // Apply heat from mouse trail
-      mouseRef.current.trail.forEach((point: TrailPoint) => {
-        const age = (Date.now() - point.time) / 1000; // Age in seconds
-        const trailIntensity = MOUSE_HEAT * 0.3 * (1 - age); // Fade with age
-        
-        const trailGridX = Math.floor(point.x / RESOLUTION);
-        const trailGridY = Math.floor(point.y / RESOLUTION);
-        
-        if (trailGridX >= 0 && trailGridX < cols && trailGridY >= 0 && trailGridY < rows) {
-          const radius = 2;
-          for (let dy = -radius; dy <= radius; dy++) {
-            for (let dx = -radius; dx <= radius; dx++) {
-              const x = trailGridX + dx;
-              const y = trailGridY + dy;
+        // Main mouse heat source
+        if (mouseGridX >= 0 && mouseGridX < cols && mouseGridY >= 0 && mouseGridY < rows) {
+          const heatRadius = mouseRef.current.isDown ? 8 : 4;
+          const heatIntensity = mouseRef.current.isDown ? MOUSE_HEAT * 1.5 : MOUSE_HEAT;
+          
+          for (let dy = -heatRadius; dy <= heatRadius; dy++) {
+            for (let dx = -heatRadius; dx <= heatRadius; dx++) {
+              const x = mouseGridX + dx;
+              const y = mouseGridY + dy;
               
               if (x >= 0 && x < cols && y >= 0 && y < rows) {
                 const distance = Math.sqrt(dx * dx + dy * dy);
-                if (distance <= radius) {
-                  const falloff = (radius - distance) / radius;
-                  grid[y][x].temperature = Math.min(100, 
-                    grid[y][x].temperature + trailIntensity * falloff);
+                if (distance <= heatRadius) {
+                  const falloff = Math.max(0, (heatRadius - distance) / heatRadius);
+                  const heatToAdd = heatIntensity * falloff * falloff;
+                  grid[y][x].temperature = Math.min(100, grid[y][x].temperature + heatToAdd);
                 }
               }
             }
           }
         }
-      });
 
-      // Heat diffusion and cooling
+        // Apply heat from mouse trail (only points that were within bounds)
+        mouseRef.current.trail.forEach((point: TrailPoint) => {
+          const age = (Date.now() - point.time) / 1000;
+          const trailIntensity = MOUSE_HEAT * 0.3 * (1 - age);
+          
+          // No need to convert - trail points are already in canvas coordinates
+          const trailGridX = Math.floor(point.x / RESOLUTION);
+          const trailGridY = Math.floor(point.y / RESOLUTION);
+          
+          if (trailGridX >= 0 && trailGridX < cols && trailGridY >= 0 && trailGridY < rows) {
+            const radius = 2;
+            for (let dy = -radius; dy <= radius; dy++) {
+              for (let dx = -radius; dx <= radius; dx++) {
+                const x = trailGridX + dx;
+                const y = trailGridY + dy;
+                
+                if (x >= 0 && x < cols && y >= 0 && y < rows) {
+                  const distance = Math.sqrt(dx * dx + dy * dy);
+                  if (distance <= radius) {
+                    const falloff = (radius - distance) / radius;
+                    grid[y][x].temperature = Math.min(100, 
+                      grid[y][x].temperature + trailIntensity * falloff);
+                  }
+                }
+              }
+            }
+          }
+        });
+      }
+
+      // Heat diffusion and cooling (always happens)
       const newGrid: HeatCell[][] = grid.map(row => row.map(cell => ({ ...cell })));
       
       for (let y = 0; y < rows; y++) {
@@ -196,7 +235,6 @@ const Heat: React.FC = () => {
           let avgTemp = 0;
           let count = 0;
           
-          // Sample surrounding cells for diffusion
           for (let dy = -1; dy <= 1; dy++) {
             for (let dx = -1; dx <= 1; dx++) {
               const nx = x + dx;
@@ -211,11 +249,10 @@ const Heat: React.FC = () => {
           
           avgTemp /= count;
           
-          // Apply diffusion and cooling
           let newTemp = grid[y][x].temperature;
-          newTemp += (avgTemp - newTemp) * DIFFUSION_RATE; // Diffusion
-          newTemp *= COOLING_RATE; // Cooling
-          newTemp = Math.max(AMBIENT_TEMP, newTemp); // Don't go below ambient
+          newTemp += (avgTemp - newTemp) * DIFFUSION_RATE;
+          newTemp *= COOLING_RATE;
+          newTemp = Math.max(AMBIENT_TEMP, newTemp);
           
           newGrid[y][x].temperature = newTemp;
           newGrid[y][x].prevTemperature = grid[y][x].temperature;
@@ -237,29 +274,24 @@ const Heat: React.FC = () => {
             const temp = newGrid[gridY][gridX].temperature;
             const normalizedTemp = Math.min(1, temp / 100);
             
-            // Heat color mapping (black -> red -> orange -> yellow -> white)
             let r: number, g: number, b: number;
             
             if (normalizedTemp < 0.25) {
-              // Black to dark red
               const t = normalizedTemp * 4;
               r = Math.floor(t * 128);
               g = 0;
               b = 0;
             } else if (normalizedTemp < 0.5) {
-              // Dark red to bright red
               const t = (normalizedTemp - 0.25) * 4;
               r = Math.floor(128 + t * 127);
               g = 0;
               b = 0;
             } else if (normalizedTemp < 0.75) {
-              // Red to orange
               const t = (normalizedTemp - 0.5) * 4;
               r = 255;
               g = Math.floor(t * 165);
               b = 0;
             } else {
-              // Orange to yellow-white
               const t = (normalizedTemp - 0.75) * 4;
               r = 255;
               g = Math.floor(165 + t * 90);
@@ -267,12 +299,11 @@ const Heat: React.FC = () => {
             }
             
             const pixelIndex = (y * dimensions.width + x) * 4;
-            data[pixelIndex] = r;     // Red
-            data[pixelIndex + 1] = g; // Green
-            data[pixelIndex + 2] = b; // Blue
-            data[pixelIndex + 3] = Math.floor(255 * Math.min(1, normalizedTemp + 0.1)); // Alpha
+            data[pixelIndex] = r;
+            data[pixelIndex + 1] = g;
+            data[pixelIndex + 2] = b;
+            data[pixelIndex + 3] = Math.floor(255 * Math.min(1, normalizedTemp + 0.1));
           } else {
-            // Fill with ambient color
             const pixelIndex = (y * dimensions.width + x) * 4;
             data[pixelIndex] = 10;
             data[pixelIndex + 1] = 15;
@@ -282,18 +313,18 @@ const Heat: React.FC = () => {
         }
       }
       
-      // Clear canvas and draw heat map
       ctx.fillStyle = 'rgb(10, 15, 25)';
       ctx.fillRect(0, 0, dimensions.width, dimensions.height);
       ctx.putImageData(imageData, 0, 0);
 
-      // Add heat distortion effect
-      if (mouseRef.current.x && mouseRef.current.y) {
+      // Add heat distortion effect (only if within bounds)
+      if (mouseRef.current.isWithinBounds && mouseRef.current.x && mouseRef.current.y) {
+        const mouseGridX = Math.floor(mouseRef.current.x / RESOLUTION);
+        const mouseGridY = Math.floor(mouseRef.current.y / RESOLUTION);
         const mouseTemp = mouseGridX >= 0 && mouseGridX < cols && mouseGridY >= 0 && mouseGridY < rows
           ? newGrid[mouseGridY][mouseGridX].temperature : 0;
         
         if (mouseTemp > 20) {
-          // Heat shimmer effect
           ctx.save();
           ctx.globalCompositeOperation = 'screen';
           ctx.fillStyle = `rgba(255, 100, 0, ${Math.min(0.1, mouseTemp / 1000)})`;
@@ -306,7 +337,7 @@ const Heat: React.FC = () => {
         }
       }
 
-      // Draw mouse trail with heat glow
+      // Draw mouse trail with heat glow (only if there's a trail)
       if (mouseRef.current.trail.length > 1) {
         ctx.save();
         ctx.globalCompositeOperation = 'screen';
@@ -341,7 +372,7 @@ const Heat: React.FC = () => {
   }, [dimensions]);
 
   return (
-    <div className="fixed inset-0 -z-10 bg-slate-900">
+    <div ref={containerRef} className="relative inset-0 bg-slate-900">
       <canvas
         ref={canvasRef}
         width={dimensions.width}
@@ -360,10 +391,14 @@ const Heat: React.FC = () => {
           <div>🖱️ MOVE: Generate Heat</div>
           <div>🖱️ CLICK: Intense Heat</div>
         </div>
+        {/* Debug info */}
+        <div className="mt-2 text-xs opacity-30">
+          <div>IN BOUNDS: {mouseRef.current?.isWithinBounds ? 'YES' : 'NO'}</div>
+        </div>
       </div>
       
       {/* Temperature scale */}
-      <div className="absolute bottom-4 right-4">
+      <div className="absolute bottom-4 left-4">
         <div className="text-white font-mono text-xs mb-2 opacity-60">TEMPERATURE</div>
         <div className="w-4 h-32 bg-gradient-to-t from-black via-red-600 via-orange-500 to-yellow-200 border border-white/20 rounded"></div>
         <div className="text-xs text-white/60 font-mono mt-1 text-center">°C</div>
