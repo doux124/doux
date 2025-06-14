@@ -3,7 +3,7 @@ import Doux from './components/Doux';
 
 function App() {
   return (
-    <Router basename="/">
+    <Router basename="/Jordan/">
       <Routes>
         <Route path="/" element={<Doux />} />
       </Routes>
