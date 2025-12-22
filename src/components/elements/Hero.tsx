@@ -15,10 +15,10 @@ const Hero: React.FC = () => {
           {/* Bio Section */}
           <div className="mb-4 md:mb-8">
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed">
-              Biomedical Engineering at NUS
+              Biomedical Engineering Student at NUS
             </p>
             <p className="text-base md:text-lg text-gray-300 mt-2">
-              Second Major in Computing • Specialization in Tissue Engineering
+              Second Major in Computing • Specialization in Tissue Engineering • Minor in AI • Minor in Design
             </p>
           </div>
           
@@ -38,12 +38,12 @@ const Hero: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2">
                 <span className="text-gray-300 font-medium">LinkedIn:</span>
                 <a
-                  href="https://linkedin.com/in/jordan-low-jun-yi-69a150279"
+                  href="https://linkedin.com/in/jordan-low-jun-yi"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="pointer-events-auto text-orange-300 hover:text-orange-200 transition-colors underline underline-offset-4"
                 >
-                  linkedin.com/in/jordan-low-69a150279
+                  linkedin.com/in/jordan-low-jun-yi
                 </a>
               </div>
               

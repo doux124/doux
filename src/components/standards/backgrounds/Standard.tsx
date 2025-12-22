@@ -19,20 +19,28 @@ interface MouseState {
 
 const Standard: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
   const mouseRef = useRef<MouseState>({ x: 0, y: 0, isActive: false });
+  const electronsRef = useRef<Electron[]>([]);
+  const isVisibleRef = useRef(true);
+  const lastFrameTimeRef = useRef(0);
 
-  // Electron parameters
+  // Performance settings
+  const TARGET_FPS = 30;
+  const FRAME_INTERVAL = 1000 / TARGET_FPS;
+
+  // Electron parameters - reduced for performance
   const ELECTRON_RADIUS: number = 3;
   const INFLUENCE_RADIUS: number = 150;
   const ELECTRON_SPEED: number = 2;
-  const MAX_ELECTRONS: number = 300;
+  const MAX_ELECTRONS: number = 100; // Reduced from 300
 
   // Electron particle system
-  const createElectrons = (): Electron[] => {
+  const createElectrons = (width: number, height: number): Electron[] => {
     return Array.from({ length: MAX_ELECTRONS }, (): Electron => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
+      x: Math.random() * width,
+      y: Math.random() * height,
       vx: (Math.random() - 0.5) * 2,
       vy: (Math.random() - 0.5) * 2,
       life: Math.random() * 100 + 50,
@@ -41,19 +49,41 @@ const Standard: React.FC = () => {
     }));
   };
 
+  // Visibility detection
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const container = containerRef.current;
+    if (!canvas || !container) return;
 
-    const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
+    const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const updateSize = () => {
+      const rect = container.getBoundingClientRect();
+      canvas.width = rect.width || window.innerWidth;
+      canvas.height = rect.height || window.innerHeight;
+      electronsRef.current = createElectrons(canvas.width, canvas.height);
+    };
 
-    let electrons: Electron[] = createElectrons();
+    updateSize();
 
     const handleMouseMove = (e: MouseEvent): void => {
+      if (!isVisibleRef.current) return;
       const rect: DOMRect = canvas.getBoundingClientRect();
       mouseRef.current.x = e.clientX - rect.left;
       mouseRef.current.y = e.clientY - rect.top;
@@ -64,11 +94,27 @@ const Standard: React.FC = () => {
       mouseRef.current.isActive = false;
     };
 
-    canvas.addEventListener('mousemove', handleMouseMove);
+    canvas.addEventListener('mousemove', handleMouseMove, { passive: true });
     canvas.addEventListener('mouseleave', handleMouseLeave);
 
-    const animate = (): void => {
-      // Clear canvas with slight fade effect to prevent permanent staining
+    const animate = (timestamp: number): void => {
+      // Skip if not visible
+      if (!isVisibleRef.current) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+
+      // Frame rate throttling
+      const elapsed = timestamp - lastFrameTimeRef.current;
+      if (elapsed < FRAME_INTERVAL) {
+        animationRef.current = requestAnimationFrame(animate);
+        return;
+      }
+      lastFrameTimeRef.current = timestamp - (elapsed % FRAME_INTERVAL);
+
+      const electrons = electronsRef.current;
+
+      // Clear canvas with fade effect
       ctx.fillStyle = 'rgba(5, 15, 25, 0.15)';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -80,9 +126,10 @@ const Standard: React.FC = () => {
         if (currentMouse.isActive) {
           const dx: number = currentMouse.x - electron.x;
           const dy: number = currentMouse.y - electron.y;
-          const distance: number = Math.sqrt(dx * dx + dy * dy);
+          const distSq: number = dx * dx + dy * dy;
           
-          if (distance < INFLUENCE_RADIUS && distance > 10) {
+          if (distSq < INFLUENCE_RADIUS * INFLUENCE_RADIUS && distSq > 100) {
+            const distance = Math.sqrt(distSq);
             const force: number = (INFLUENCE_RADIUS - distance) / INFLUENCE_RADIUS * 0.15;
             electron.vx += (dx / distance) * force;
             electron.vy += (dy / distance) * force;
@@ -101,30 +148,17 @@ const Standard: React.FC = () => {
 
         // Boundary wrapping with trail management
         let wrapped: boolean = false;
-        if (electron.x < 0) {
-          electron.x = canvas.width;
-          wrapped = true;
-        }
-        if (electron.x > canvas.width) {
-          electron.x = 0;
-          wrapped = true;
-        }
-        if (electron.y < 0) {
-          electron.y = canvas.height;
-          wrapped = true;
-        }
-        if (electron.y > canvas.height) {
-          electron.y = 0;
-          wrapped = true;
-        }
+        if (electron.x < 0) { electron.x = canvas.width; wrapped = true; }
+        if (electron.x > canvas.width) { electron.x = 0; wrapped = true; }
+        if (electron.y < 0) { electron.y = canvas.height; wrapped = true; }
+        if (electron.y > canvas.height) { electron.y = 0; wrapped = true; }
 
-        // Clear trail if electron wrapped to prevent laser lines
+        // Clear trail if electron wrapped
         if (wrapped) {
           electron.trail = [];
         } else {
-          // Update trail only if not wrapped
           electron.trail.push({ x: electron.x, y: electron.y });
-          if (electron.trail.length > 12) electron.trail.shift();
+          if (electron.trail.length > 8) electron.trail.shift(); // Shorter trails
         }
 
         // Update life
@@ -141,114 +175,68 @@ const Standard: React.FC = () => {
           };
         }
 
-        // Draw electron trail with gradient
+        const alpha: number = electron.life / electron.maxLife;
+
+        // Simplified trail drawing - single path instead of per-segment gradients
         if (electron.trail.length > 1) {
+          ctx.strokeStyle = `rgba(100, 200, 255, ${alpha * 0.6})`;
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(electron.trail[0].x, electron.trail[0].y);
           for (let i = 1; i < electron.trail.length; i++) {
-            const alpha: number = (i / electron.trail.length) * (electron.life / electron.maxLife) * 0.8;
-            const prevPoint = electron.trail[i - 1];
-            const currentPoint = electron.trail[i];
-            
-            // Create gradient for each trail segment
-            const gradient: CanvasGradient = ctx.createLinearGradient(
-              prevPoint.x, prevPoint.y, currentPoint.x, currentPoint.y
-            );
-            gradient.addColorStop(0, `rgba(100, 200, 255, ${alpha * 0.5})`);
-            gradient.addColorStop(1, `rgba(150, 220, 255, ${alpha})`);
-            
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 1 + alpha * 2;
-            ctx.beginPath();
-            ctx.moveTo(prevPoint.x, prevPoint.y);
-            ctx.lineTo(currentPoint.x, currentPoint.y);
-            ctx.stroke();
+            ctx.lineTo(electron.trail[i].x, electron.trail[i].y);
           }
+          ctx.stroke();
         }
 
-        // Draw electron with enhanced glow
-        const alpha: number = electron.life / electron.maxLife;
+        // Simplified electron rendering - fewer gradient stops
         const speed: number = Math.sqrt(electron.vx * electron.vx + electron.vy * electron.vy);
         const intensity: number = Math.min(speed * 0.5 + 0.5, 1);
         
-        // Outer glow
-        const outerGradient: CanvasGradient = ctx.createRadialGradient(
-          electron.x, electron.y, 0, electron.x, electron.y, ELECTRON_RADIUS * 4
+        // Combined glow (simplified from separate outer/inner)
+        const gradient: CanvasGradient = ctx.createRadialGradient(
+          electron.x, electron.y, 0, electron.x, electron.y, ELECTRON_RADIUS * 3
         );
-        outerGradient.addColorStop(0, `rgba(100, 200, 255, ${alpha * intensity * 0.6})`);
-        outerGradient.addColorStop(0.5, `rgba(50, 150, 255, ${alpha * intensity * 0.3})`);
-        outerGradient.addColorStop(1, 'rgba(0, 100, 200, 0)');
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * intensity})`);
+        gradient.addColorStop(0.3, `rgba(150, 220, 255, ${alpha * intensity * 0.7})`);
+        gradient.addColorStop(1, 'rgba(50, 150, 255, 0)');
         
-        ctx.fillStyle = outerGradient;
+        ctx.fillStyle = gradient;
         ctx.beginPath();
-        ctx.arc(electron.x, electron.y, ELECTRON_RADIUS * 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Inner core
-        const coreGradient: CanvasGradient = ctx.createRadialGradient(
-          electron.x, electron.y, 0, electron.x, electron.y, ELECTRON_RADIUS
-        );
-        coreGradient.addColorStop(0, `rgba(255, 255, 255, ${alpha * intensity})`);
-        coreGradient.addColorStop(0.3, `rgba(200, 230, 255, ${alpha * intensity * 0.8})`);
-        coreGradient.addColorStop(1, `rgba(100, 200, 255, ${alpha * intensity * 0.4})`);
-        
-        ctx.fillStyle = coreGradient;
-        ctx.beginPath();
-        ctx.arc(electron.x, electron.y, ELECTRON_RADIUS, 0, Math.PI * 2);
+        ctx.arc(electron.x, electron.y, ELECTRON_RADIUS * 3, 0, Math.PI * 2);
         ctx.fill();
       });
 
-      // Draw mouse influence field with smoother gradient
+      // Simplified mouse influence field
       if (currentMouse.isActive) {
-        // Large outer influence zone with more gradient stops
-        const outerGradient: CanvasGradient = ctx.createRadialGradient(
+        const gradient: CanvasGradient = ctx.createRadialGradient(
           currentMouse.x, currentMouse.y, 0, currentMouse.x, currentMouse.y, INFLUENCE_RADIUS
         );
-        outerGradient.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
-        outerGradient.addColorStop(0.1, 'rgba(200, 230, 255, 0.08)');
-        outerGradient.addColorStop(0.25, 'rgba(150, 210, 255, 0.06)');
-        outerGradient.addColorStop(0.4, 'rgba(100, 180, 255, 0.04)');
-        outerGradient.addColorStop(0.6, 'rgba(50, 150, 255, 0.02)');
-        outerGradient.addColorStop(0.8, 'rgba(25, 125, 200, 0.01)');
-        outerGradient.addColorStop(1, 'rgba(0, 100, 200, 0)');
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.12)');
+        gradient.addColorStop(0.3, 'rgba(150, 210, 255, 0.05)');
+        gradient.addColorStop(1, 'rgba(0, 100, 200, 0)');
         
-        ctx.fillStyle = outerGradient;
+        ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(currentMouse.x, currentMouse.y, INFLUENCE_RADIUS, 0, Math.PI * 2);
         ctx.fill();
 
-        // Smaller central core with smoother gradient
-        const coreGradient: CanvasGradient = ctx.createRadialGradient(
-          currentMouse.x, currentMouse.y, 0, currentMouse.x, currentMouse.y, 8
-        );
-        coreGradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        coreGradient.addColorStop(0.2, 'rgba(240, 248, 255, 0.6)');
-        coreGradient.addColorStop(0.4, 'rgba(200, 230, 255, 0.4)');
-        coreGradient.addColorStop(0.7, 'rgba(150, 200, 255, 0.2)');
-        coreGradient.addColorStop(1, 'rgba(100, 180, 255, 0)');
-        
-        ctx.fillStyle = coreGradient;
+        // Simple center dot
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.beginPath();
-        ctx.arc(currentMouse.x, currentMouse.y, 8, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Tiny bright center
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.beginPath();
-        ctx.arc(currentMouse.x, currentMouse.y, 2, 0, Math.PI * 2);
+        ctx.arc(currentMouse.x, currentMouse.y, 3, 0, Math.PI * 2);
         ctx.fill();
       }
 
       animationRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    animationRef.current = requestAnimationFrame(animate);
 
-    const handleResize = (): void => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      electrons = createElectrons();
-    };
-
-    window.addEventListener('resize', handleResize);
+    const resizeObserver = new ResizeObserver(() => {
+      updateSize();
+    });
+    resizeObserver.observe(container);
 
     return () => {
       if (animationRef.current) {
@@ -256,12 +244,12 @@ const Standard: React.FC = () => {
       }
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-gray-900">
+    <div ref={containerRef} className="fixed inset-0 bg-gray-900">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-crosshair"
