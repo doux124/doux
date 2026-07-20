@@ -117,7 +117,7 @@ export type Section =
 export const hero: HeroContent = {
   name: 'Jordan Low Jun Yi',
   tagline: 'Biomedical Engineering Student at NUS',
-  majors: 'Second Major in Computing • Specialization in Tissue Engineering • Minor in AI • Minor in Design',
+  majors: 'Second Major in Computing • Specialization in Tissue Engineering • Specialization in Robotics • Minor in AI • Minor in Design',
   contacts: [
     {
       label: 'Email',
@@ -257,6 +257,19 @@ export const sections: Section[] = [
       },
       {
         id: 4,
+        title: 'Rover-X: Payload Design for a Surveillance Robot',
+        subtitle: 'Simulation-led payload design balancing heat dissipation, waterproofing and surveillance function',
+        features: [
+          'Used SolidWorks simulations to work out how to construct the payload for Rover-X, the HomeTeam robotic surveillance dog',
+          'Balanced two constraints that pull against each other: shedding heat while keeping the payload waterproof',
+          'Kept the payload able to carry out its surveillance function under both of those constraints',
+          'Improved heat dissipation through iterative design enhancements',
+        ],
+        image: `${BASE}images/Showcase/RoverX.jpeg`,
+        gradient: 'from-lime-500 to-emerald-600',
+      },
+      {
+        id: 5,
         title: 'CARE-Liver: Fibrosis Staging on MRI',
         subtitle: 'A segmentation-to-staging deep-learning cascade for liver fibrosis on multi-vendor MRI',
         features: [

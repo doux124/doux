@@ -31,7 +31,9 @@ const Hero: React.FC = () => {
           {/* Bio Section */}
           <div data-reveal className="mb-4 md:mb-8">
             <p className="text-lg md:text-xl text-gray-200 leading-relaxed">{hero.tagline}</p>
-            <p className="text-base md:text-lg text-gray-300 mt-2">{hero.majors}</p>
+            {/* text-balance: the line now wraps, so even out the two lines
+                instead of leaving "Minor in Design" orphaned on its own */}
+            <p className="text-base md:text-lg text-gray-300 mt-2 text-balance">{hero.majors}</p>
           </div>
 
           {/* Contact Section */}
