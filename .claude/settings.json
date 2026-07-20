@@ -42,7 +42,14 @@
       "Bash(node replay.mjs)",
       "Bash(grep -rhoE '\\\\b\\(bg|text|border|from|via|to|ring|shadow|fill|stroke|decoration|outline|divide|placeholder|accent\\)-\\(slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose|white|black\\)\\(-[0-9]{1,3}\\)?' src --include=\"*.tsx\" --include=\"*.ts\")",
       "Bash(grep -nE \"#[0-9A-Fa-f]{3,8}|rgba?\\\\\\(\" src/components/standards/backgrounds/Semiconductor.tsx src/components/standards/backgrounds/Standard.tsx)",
-      "Bash(node -e ' *)"
+      "Bash(node -e ' *)",
+      "Bash(git -C node_modules/.cache/gh-pages/https\\\\!github.com\\\\!doux124\\\\!doux.git log --oneline -3)",
+      "Bash(git fetch *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git branch *)",
+      "Bash(curl -sL -w \"\\\\n[HTTP %{http_code}]\\\\n\" https://jordanlowjunyi.github.io/Jordan/)"
     ]
   }
 }
