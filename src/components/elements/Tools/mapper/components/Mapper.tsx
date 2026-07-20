@@ -453,7 +453,7 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
     <div className="h-full flex flex-col bg-dark-900">
       {/* Recording Banner */}
       {recording && (
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-black py-3 px-4 text-center font-semibold text-sm">
+        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white py-3 px-4 text-center font-semibold text-sm">
           ⏺ Recording path... Walk near nodes to connect!
         </div>
       )}
@@ -506,7 +506,7 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
               className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition ${
                 currentFloor === f
                   ? 'bg-white text-black'
-                  : 'bg-gray-600 text-black hover:bg-gray-400'
+                  : 'bg-gray-600 text-white hover:bg-gray-400'
               }`}
             >
               {label}
@@ -545,13 +545,21 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
 
       {/* Controls */}
       <div className="p-4 bg-dark-900 border-t border-dark-700">
+        {gps.error && (
+          <div
+            role="alert"
+            className="mb-3 rounded-lg border border-red-500/40 bg-red-500/15 px-3 py-2 text-sm text-red-200"
+          >
+            {gps.error} — check that location access is allowed for this site.
+          </div>
+        )}
         <div className="grid grid-cols-3 gap-2">
           <button
             onClick={toggleGPS}
             className={`py-3 px-4 rounded-lg font-semibold text-sm transition ${
               gps.isActive
-                ? 'bg-red-600 hover:bg-red-700 text-black'
-                : 'bg-green-600 hover:bg-green-400 text-black'
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-green-600 hover:bg-green-400 text-white'
             }`}
           >
             <Navigation className="inline mr-2" size={16} />
@@ -562,8 +570,8 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
             disabled={!gps.isActive}
             className={`py-3 px-4 rounded-lg font-semibold text-sm transition disabled:opacity-40 ${
               recording
-                ? 'bg-red-600 hover:bg-red-700 text-black'
-                : 'bg-purple-600 hover:bg-purple-700 text-black'
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-purple-600 hover:bg-purple-700 text-white'
             }`}
           >
             {recording ? <StopIcon className="inline mr-2" size={16} /> : <Play className="inline mr-2" size={16} />}
@@ -572,7 +580,7 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
           <button
             onClick={() => setShowModal(true)}
             disabled={!gps.isActive}
-            className="py-3 px-4 rounded-lg font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-black transition disabled:opacity-40"
+            className="py-3 px-4 rounded-lg font-semibold text-sm bg-blue-600 hover:bg-blue-700 text-white transition disabled:opacity-40"
           >
             <MapPin className="inline mr-2" size={16} />
             Add Node
@@ -580,7 +588,7 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
         </div>
         <button
           onClick={handleSaveMap}
-          className="w-full mt-2 py-3 px-4 rounded-lg font-semibold text-sm bg-gray-400 hover:bg-gray-600 text-black transition"
+          className="w-full mt-2 py-3 px-4 rounded-lg font-semibold text-sm bg-gray-400 hover:bg-gray-600 text-white transition"
         >
           <Save className="inline mr-2" size={16} />
           Save Map
@@ -645,7 +653,7 @@ const Mapper: React.FC<MapperProps> = ({ onSave, loadedMap }) => {
               </button>
               <button
                 onClick={addNode}
-                className="flex-1 py-3 px-4 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-black transition"
+                className="flex-1 py-3 px-4 rounded-lg font-semibold text-sm bg-green-600 hover:bg-green-700 text-white transition"
               >
                 Save
               </button>

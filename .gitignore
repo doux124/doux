@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# macOS AppleDouble resource forks
+._*
+**/._*
+
+# Source research documents — reference material for site copy, not part of the site.
+# Kept outside public/ so `vite build` never copies them into dist/ and they are
+# never published by `npm run deploy`.
+research-notes/
+public/information/*.docx

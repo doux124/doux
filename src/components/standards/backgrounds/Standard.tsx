@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { prefersReducedMotion } from '../../../lib/motion';
 
 // Type definitions
 interface Electron {
@@ -81,6 +82,13 @@ const Standard: React.FC = () => {
     };
 
     updateSize();
+
+    // Respect the user's motion preference: paint one static frame, skip the rAF loop.
+    if (prefersReducedMotion()) {
+      ctx.fillStyle = '#0a0f1c';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent): void => {
       if (!isVisibleRef.current) return;
@@ -249,7 +257,7 @@ const Standard: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="fixed inset-0 bg-gray-900">
+    <div ref={containerRef} className="absolute inset-0 bg-gray-900">
       <canvas
         ref={canvasRef}
         className="absolute inset-0 cursor-crosshair"

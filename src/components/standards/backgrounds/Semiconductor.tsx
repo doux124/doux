@@ -1,4 +1,5 @@
 import { useRef, useEffect } from 'react';
+import { prefersReducedMotion } from '../../../lib/motion';
 
 // Type definitions
 interface LatticeNode {
@@ -131,15 +132,31 @@ const Semiconductor: React.FC = () => {
     const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
+    let prevW = -1;
+    let prevH = -1;
     const updateSize = () => {
       const rect = container.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
-      nodesRef.current = createLatticeNodes(canvas.width, canvas.height);
-      electronsRef.current = createElectrons(canvas.width, canvas.height);
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+      // Skip the expensive O(n^2) lattice rebuild when the size hasn't actually changed
+      // (ResizeObserver fires on every mobile URL-bar collapse and scroll reflow).
+      if (w === prevW && h === prevH) return;
+      prevW = w;
+      prevH = h;
+      canvas.width = w;
+      canvas.height = h;
+      nodesRef.current = createLatticeNodes(w, h);
+      electronsRef.current = createElectrons(w, h);
     };
 
     updateSize();
+
+    // Respect the user's motion preference: paint one static frame, skip the rAF loop.
+    if (prefersReducedMotion()) {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
 
     const handleMouseMove = (e: MouseEvent): void => {
       if (!isVisibleRef.current) return;
@@ -371,8 +388,11 @@ const Semiconductor: React.FC = () => {
 
     animationRef.current = requestAnimationFrame(animate);
 
+    // Coalesce bursts of ResizeObserver fires into a single rAF-timed updateSize.
+    let resizeRaf = 0;
     const resizeObserver = new ResizeObserver(() => {
-      updateSize();
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(updateSize);
     });
     resizeObserver.observe(container);
 
@@ -380,6 +400,7 @@ const Semiconductor: React.FC = () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
+      cancelAnimationFrame(resizeRaf);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
       resizeObserver.disconnect();

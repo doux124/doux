@@ -5,9 +5,9 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #0a0f1c;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -21,16 +21,36 @@ body {
   min-height: 100vh;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+/* Accessible skip link — hidden until focused, then jumps to main content. */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100000;
+  padding: 0.75rem 1rem;
+  background: #0a0f1c;
+  color: #fff;
+  border-radius: 0 0 0.5rem 0;
 }
-a:hover {
-  color: #535bf2;
+.skip-link:focus {
+  left: 0;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Shared keyframe used by the Pedantle masked-word length hint. */
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Motion killswitch backstop: honour prefers-reduced-motion for all CSS-driven
+   animation/transition. Canvas backgrounds gate their rAF loops separately in JS. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

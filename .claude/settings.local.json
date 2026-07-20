@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(unzip -l /Users/Jordan/Documents/VSC/doux/src/components/elements/Sections/BME/manhattan-hero.zip)",
+      "Bash(unzip /Users/Jordan/Documents/VSC/doux/src/components/elements/Sections/BME/manhattan-hero.zip -d /tmp/manhattan-hero-extract/)"
+    ]
+  }
+}

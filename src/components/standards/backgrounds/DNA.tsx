@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { prefersReducedMotion } from '../../../lib/motion';
 
 interface Point {
   x: number;
@@ -36,7 +37,9 @@ type Segment = RibbonSegment | BasePairSegment;
 const DNA: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const mouseRef = useRef<{ x: number; y: number }>({ x: -1000, y: -1000 });
+  // Canvas-local y of the replication fork, driven by scroll position.
+  // Starts far off-canvas so nothing unzips before the first measurement.
+  const forkYRef = useRef<number>(-100000);
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 800, height: 600 });
   const isVisibleRef = useRef(true);
   const lastFrameTimeRef = useRef(0);
@@ -63,15 +66,14 @@ const DNA: React.FC = () => {
     const container = containerRef.current;
     
     const updateDimensions = () => {
-      if (container) {
-        const rect = container.getBoundingClientRect();
-        setDimensions({ 
-          width: rect.width || window.innerWidth, 
-          height: rect.height || window.innerHeight 
-        });
-      } else {
-        setDimensions({ width: window.innerWidth, height: window.innerHeight });
-      }
+      const rect = container ? container.getBoundingClientRect() : null;
+      const width = rect?.width || window.innerWidth;
+      const height = rect?.height || window.innerHeight;
+      // Bail out when nothing changed so the animation effect isn't torn down and
+      // rebuilt on every resize/scroll-driven ResizeObserver fire.
+      setDimensions((prev) =>
+        prev.width === width && prev.height === height ? prev : { width, height }
+      );
     };
     
     updateDimensions();
@@ -88,6 +90,36 @@ const DNA: React.FC = () => {
     };
   }, []);
 
+  // The fork sits wherever the viewport centre currently falls on the canvas, so the
+  // helix unzips at the scroll point and the split travels down as the user scrolls.
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || prefersReducedMotion()) return;
+
+    let frame = 0;
+
+    const measure = () => {
+      frame = 0;
+      forkYRef.current = window.innerHeight / 2 - container.getBoundingClientRect().top;
+    };
+
+    // Coalesce to one rect read per frame; scroll fires far more often than we draw.
+    const schedule = () => {
+      if (frame) return;
+      frame = requestAnimationFrame(measure);
+    };
+
+    measure();
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
+  }, []);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
@@ -98,17 +130,12 @@ const DNA: React.FC = () => {
     let animationId: number;
     let time = 0;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isVisibleRef.current) return;
-      const r = canvas.getBoundingClientRect();
-      mouseRef.current = { x: e.clientX - r.left, y: e.clientY - r.top };
-    };
-    const handleMouseLeave = () => {
-      mouseRef.current = { x: -1000, y: -1000 };
-    };
-
-    window.addEventListener('mousemove', handleMouseMove, { passive: true });
-    canvas.addEventListener('mouseleave', handleMouseLeave);
+    // Respect the user's motion preference: paint one static frame, skip the rAF loop.
+    if (prefersReducedMotion()) {
+      ctx.fillStyle = '#030712';
+      ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+      return;
+    }
 
     const basePairColors: BasePairColor[] = [
       { a: '#FF6B9D', b: '#4ECDC4' },
@@ -204,8 +231,6 @@ const DNA: React.FC = () => {
       }
 
       const centerX = width / 2;
-      const forkY = mouseRef.current.y;
-      const forkActive = forkY > 0 && forkY < height;
 
       const radius = 80;
       const step = 2.5; // Increased step for fewer calculations
@@ -216,6 +241,12 @@ const DNA: React.FC = () => {
       const transitionZone = 120;
       const unwoundHalfHeight = 80;
       const maxSeparation = 140;
+
+      // Let the fork stay "active" one full influence radius beyond each edge so it
+      // slides in and out of the canvas continuously instead of popping open.
+      const forkY = forkYRef.current;
+      const forkReach = unwoundHalfHeight + transitionZone;
+      const forkActive = forkY > -forkReach && forkY < height + forkReach;
 
       const s1: Point[] = [];
       const s2: Point[] = [];
@@ -380,8 +411,6 @@ const DNA: React.FC = () => {
     
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('mousemove', handleMouseMove);
-      canvas.removeEventListener('mouseleave', handleMouseLeave);
     };
   }, [dimensions]);
 

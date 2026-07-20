@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Github, Linkedin, Mail, GraduationCap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { playSound } from '../../../lib/sound';
+import { sections } from '../../../content/siteContent';
 import './action.css';
 
 interface MenuProps {
@@ -20,7 +22,7 @@ interface BookProps {
 
 const Book: React.FC<BookProps> = ({ title, color, glowColor, onClick, delay, thickness = 60 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const bookRef = useRef<HTMLDivElement>(null);
+  const bookRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (bookRef.current) {
@@ -33,9 +35,11 @@ const Book: React.FC<BookProps> = ({ title, color, glowColor, onClick, delay, th
   }, [delay]);
 
   return (
-    <div
+    <button
+      type="button"
       ref={bookRef}
-      className="relative cursor-pointer select-none"
+      aria-label={title}
+      className="book-btn relative block cursor-pointer select-none border-0 bg-transparent p-0 text-left"
       style={{
         height: `${thickness}px`,
         width: '100%',
@@ -44,6 +48,8 @@ const Book: React.FC<BookProps> = ({ title, color, glowColor, onClick, delay, th
       }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
       onClick={onClick}
     >
       {/* Book body */}
@@ -106,29 +112,25 @@ const Book: React.FC<BookProps> = ({ title, color, glowColor, onClick, delay, th
           }}
         />
       </div>
-    </div>
+    </button>
   );
 };
 
 const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
-  const clickSound = useRef<HTMLAudioElement>(
-    new Audio("/jordan/audio/sound_effects/infographic-button.mp3")
-  );
-  const coolSound = useRef<HTMLAudioElement>(
-    new Audio("/jordan/audio/sound_effects/click.mp3")
-  );
 
-  const playSound = (): void => {
-    clickSound.current.currentTime = 0;
-    clickSound.current.play();
-  };
-
-  const playCoolSound = (): void => {
-    coolSound.current.currentTime = 0;
-    coolSound.current.play();
-  };
+  // Generated once so particles don't reshuffle on every render.
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }, () => ({
+        left: Math.random() * 100,
+        top: Math.random() * 100,
+        duration: 3 + Math.random() * 4,
+        delay: Math.random() * 2,
+      })),
+    []
+  );
 
   const scrollToSection = (sectionId: string): void => {
     const element = document.getElementById(sectionId);
@@ -137,6 +139,8 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
         behavior: 'smooth',
         block: 'start',
       });
+      // Make the section shareable/bookmarkable without triggering the router.
+      window.history.replaceState(null, '', `#${sectionId}`);
       if (onMenuClose) {
         setTimeout(() => onMenuClose(), 500);
       }
@@ -157,24 +161,21 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
     }
   }, [isMenuOpen]);
 
+  const clickSfx = () => playSound('audio/sound_effects/click.mp3');
+
+  // One book per page section (in config order), then the standalone Games entry.
   const books = [
-    {
-      title: 'BIOMEDICAL ENGINEERING',
-      color: '#ec4899',
-      glowColor: '#f472b6',
-      onClick: () => { playCoolSound(); scrollToSection('bme-section'); },
-    },
-    {
-      title: 'COMPUTER SCIENCE',
-      color: '#8b5cf6',
-      glowColor: '#a78bfa',
-      onClick: () => { playCoolSound(); scrollToSection('cs-section'); },
-    },
+    ...sections.map((section) => ({
+      title: section.nav.label,
+      color: section.nav.color,
+      glowColor: section.nav.glow,
+      onClick: () => { clickSfx(); scrollToSection(section.id); },
+    })),
     {
       title: 'GAMES',
       color: '#06b6d4',
       glowColor: '#22d3ee',
-      onClick: () => { playCoolSound(); navigate('/Tools'); },
+      onClick: () => { clickSfx(); navigate('/Tools'); },
     },
   ];
 
@@ -182,8 +183,8 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
     <div className="page__style">
       <style>{`
         @keyframes scanLine {
-          0% { top: -4px; }
-          100% { top: calc(100% + 4px); }
+          0% { transform: translateY(-4px); }
+          100% { transform: translateY(59px); }
         }
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
@@ -196,8 +197,12 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
       `}</style>
 
       <div
+        id="main-menu"
         className="menu"
         ref={menuRef}
+        role="dialog"
+        aria-label="Site navigation"
+        inert={!isMenuOpen}
         style={{ transform: 'translateX(100%)', opacity: 0 }}
       >
         {/* Dark sci-fi background */}
@@ -224,16 +229,16 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
 
         {/* Floating particles */}
         <div className="absolute inset-0 overflow-hidden z-1">
-          {[...Array(20)].map((_, i) => (
+          {particles.map((p, i) => (
             <div
               key={i}
               className="absolute w-1 h-1 rounded-full"
               style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
+                left: `${p.left}%`,
+                top: `${p.top}%`,
                 background: `radial-gradient(circle, ${['#ec4899', '#8b5cf6', '#06b6d4'][i % 3]} 0%, transparent 70%)`,
-                animation: `float ${3 + Math.random() * 4}s ease-in-out infinite`,
-                animationDelay: `${Math.random() * 2}s`,
+                animation: `float ${p.duration}s ease-in-out infinite`,
+                animationDelay: `${p.delay}s`,
                 opacity: 0.6,
               }}
             />
@@ -299,18 +304,21 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
           {/* Social buttons */}
           <div className="flex items-center justify-center gap-4 mt-6">
             {[
-              { icon: Github, url: 'https://github.com/doux124', color: '#6e5494' },
-              { icon: Linkedin, url: 'https://www.linkedin.com/in/jordan-low-jun-yi-69a150279/', color: '#0077b5' },
-              { icon: Mail, url: 'mailto:onezeroten124@gmail.com?subject=Contact%20from%20Website&body=Hi%20Jordan,', color: '#ea4335' },
-              { icon: GraduationCap, url: 'https://scholar.google.com/citations?hl=en&user=O6M8clAAAAAJ', color: '#4285f4' },
-            ].map(({ icon: Icon, url, color }, index) => (
+              { icon: Github, label: 'GitHub', url: 'https://github.com/doux124', color: '#6e5494' },
+              { icon: Linkedin, label: 'LinkedIn', url: 'https://www.linkedin.com/in/jordan-low-jun-yi-69a150279/', color: '#0077b5' },
+              { icon: Mail, label: 'Email', url: 'mailto:onezeroten124@gmail.com?subject=Contact%20from%20Website&body=Hi%20Jordan,', color: '#ea4335' },
+              { icon: GraduationCap, label: 'Google Scholar', url: 'https://scholar.google.com/citations?hl=en&user=O6M8clAAAAAJ', color: '#4285f4' },
+            ].map(({ icon: Icon, label, url, color }, index) => (
               <button
                 key={index}
+                type="button"
+                aria-label={label}
+                title={label}
                 onClick={() => {
-                  playSound();
-                  window.open(url, '_blank');
+                  playSound('audio/sound_effects/infographic-button.mp3');
+                  window.open(url, '_blank', 'noopener,noreferrer');
                 }}
-                className="relative p-1 rounded-full transition-all duration-300 cursor-pointer hover:scale-125"
+                className="social-icon-btn relative p-1 rounded-full transition-all duration-300 cursor-pointer hover:scale-125"
                 style={{
                   background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`,
                   boxShadow: `0 0 15px ${color}60`,
@@ -318,6 +326,7 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
               >
                 <Icon
                   size={20}
+                  aria-hidden="true"
                   className="transition-all duration-300"
                   style={{
                     color: '#ffffff',
@@ -332,7 +341,7 @@ const Menu: React.FC<MenuProps> = ({ isMenuOpen, onMenuClose }) => {
           <p
             className="mt-8 text-sm tracking-wider select-none"
             style={{
-              color: 'rgba(224, 224, 255, 0.5)',
+              color: 'rgba(224, 224, 255, 0.7)',
             }}
           >
             Coded by Jordan Low Jun Yi

@@ -190,7 +190,7 @@ const PedantleGame: React.FC = () => {
   }, [guessedWords]);
 
   return (
-    <div className="w-screen h-screen p-6 bg-white overflow-y-auto">
+    <div className="w-full min-h-dvh p-6 bg-white overflow-y-auto">
       {loading && <p className="text-center">Loading article...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
@@ -223,7 +223,7 @@ const PedantleGame: React.FC = () => {
             <div className="flex-1">{renderMaskedParagraphs()}</div>
 
             {/* Past guesses list */}
-            <div className="w-48 p-2 border rounded bg-gray-50">
+            <div className="w-full md:w-48 p-2 border rounded bg-gray-50 order-first md:order-none">
               <h2 className="font-bold mb-2 text-center">Past Guesses</h2>
               <ol className="list-decimal list-inside text-sm">
                 {pastGuesses.map((guess, idx) => (
@@ -233,18 +233,22 @@ const PedantleGame: React.FC = () => {
             </div>
           </div>
 
-          <a
-            href={page.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block text-blue-600 hover:underline"
-          >
-            Read more on Wikipedia
-          </a>
+          {/* Only reveal the article link once the title is fully solved — the URL
+              itself contains the answer, so it would be a spoiler while playing. */}
+          {page.title.split(/\s+/).every((w) => guessedWords.has(normalizeWord(w))) && (
+            <a
+              href={page.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-block text-blue-600 hover:underline"
+            >
+              Read more on Wikipedia
+            </a>
+          )}
 
           <button
             onClick={fetchRandomExtraArticle}
-            className="mt-4 ml-4 px-4 py-2 bg-blue-600 text-black rounded hover:bg-blue-700"
+            className="mt-4 ml-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Load Another Article
           </button>

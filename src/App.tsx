@@ -6,7 +6,7 @@ import Map from './components/elements/Tools/mapper/Map';
 
 function App() {
   return (
-    <Router basename="/Jordan/">
+    <Router basename={import.meta.env.BASE_URL}>
       <Routes>
         <Route path="/" element={<Doux />} />
 

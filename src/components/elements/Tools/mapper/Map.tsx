@@ -1,12 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft } from 'lucide-react';
 import Mapper from './components/Mapper';
 import Visualizer from './components/Visualizer';
 import Pathfinding from './components/Pathfinding';
 import Storage from './components/Storage';
 import { storageUtils } from './utils/storage';
 import type { MapData, Tab } from './utils/types';
+import './mapper.css';
 
 function Map() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<string>('mapper');
   const [loadedMap, setLoadedMap] = useState<MapData | null>(null);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
@@ -30,11 +34,11 @@ function Map() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#0a0a0b] text-white">
+    <div className="flex h-dvh w-full overflow-hidden bg-[#0a0a0b] text-white">
       {/* Sidebar Navigation */}
       <aside
         className={`
-          relative z-30 flex h-full w-64 flex-col
+          relative z-30 flex h-full w-16 lg:w-64 flex-col
           border-r border-white/[0.06] bg-[#0a0a0b]
           transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]
           ${isLoaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}
@@ -42,6 +46,19 @@ function Map() {
       >
         {/* Subtle sidebar gradient */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" />
+
+        {/* Back to Games */}
+        <div className="relative px-3 py-3">
+          <button
+            type="button"
+            onClick={() => navigate('/Tools')}
+            aria-label="Back to Games"
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-white/60 transition-colors hover:bg-white/[0.06] hover:text-white"
+          >
+            <ArrowLeft className="h-5 w-5 shrink-0" aria-hidden="true" />
+            <span className="hidden text-[13px] font-medium lg:inline">Back to Games</span>
+          </button>
+        </div>
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-2">
@@ -106,7 +123,7 @@ function Map() {
                   </span>
 
                   {/* Label */}
-                  <span className="relative text-[13px] font-medium">
+                  <span className="relative hidden text-[13px] font-medium lg:inline">
                     {tab.label}
                   </span>
 
