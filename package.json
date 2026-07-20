@@ -6,11 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:jordan": "tsc -b && VITE_BASE=/Jordan/ vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist && git push origin main",
-    "build:jordan": "tsc -b && VITE_BASE=/Jordan/ vite build",
+    "deploy": "npm run deploy:doux && npm run deploy:jordan",
+    "deploy:doux": "npm run build && gh-pages -d dist && git push origin main",
     "deploy:jordan": "npm run build:jordan && gh-pages -d dist -r https://github.com/JordanLowJunYi/Jordan.git && git push https://github.com/JordanLowJunYi/Jordan.git main"
   },
   "dependencies": {
