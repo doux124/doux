@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist && git push origin main"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.7",
@@ -25,6 +25,7 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.1.12",
     "@types/react-dom": "^19.1.2",
     "@types/react-slick": "^0.23.13",
