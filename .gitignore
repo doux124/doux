@@ -32,3 +32,7 @@ dist-ssr
 # never published by `npm run deploy`.
 research-notes/
 public/information/*.docx
+
+# Claude Code machine-local settings — personal permission grants, not shared.
+# (the existing *.local rule does not match *.local.json)
+.claude/settings.local.json
