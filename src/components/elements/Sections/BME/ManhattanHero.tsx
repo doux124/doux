@@ -406,27 +406,39 @@ export function ManhattanHero() {
       });
     }, wrap);
 
-    // Idle the loop while the canvas is off-screen.
-    let visible = true;
-    const io = new IntersectionObserver(
-      ([entry]) => { visible = entry.isIntersecting; },
-      { threshold: 0 }
-    );
-    io.observe(wrap);
-
     // Throttle to 30fps — the scroll-scrubbed formation is smooth well below 60fps.
     const FRAME_INTERVAL = 1000 / 30;
     let lastFrame = 0;
+    let visible = true;
 
+    // Fully stop the loop while off-screen (rafId = 0) rather than rescheduling a
+    // no-op frame. When this canvas is placed in the projects carousel, react-slick
+    // clones it for the infinite loop, so several copies exist; only the on-screen
+    // one should spend any frames. The IntersectionObserver re-arms the loop when a
+    // copy scrolls back into view.
     const tick = (now: number) => {
-      if (!visible || now - lastFrame < FRAME_INTERVAL) {
-        rafId = requestAnimationFrame(tick);
+      if (!visible) {
+        rafId = 0;
         return;
       }
-      lastFrame = now;
-      renderFrame(now);
+      if (now - lastFrame >= FRAME_INTERVAL) {
+        lastFrame = now;
+        renderFrame(now);
+      }
       rafId = requestAnimationFrame(tick);
     };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && rafId === 0) {
+          lastFrame = 0;
+          rafId = requestAnimationFrame(tick);
+        }
+      },
+      { threshold: 0 }
+    );
+    io.observe(wrap);
 
     rafId = requestAnimationFrame(tick);
 
