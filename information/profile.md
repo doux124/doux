@@ -16,15 +16,14 @@ machine-learning and web software for healthcare.
   segments the liver on MRI with nnU-Net (Dice 0.97) and stages fibrosis across
   scanner vendors (first-author paper in press, MICCAI 2026 Satellite Events); liver
   ultrasound AI that estimates liver fat and stiffness from plain ultrasound
-  (co-first author, Journal of Gastroenterology and Hepatology, 2026); Kampung
-  Echoes; NAISC 2026; kosmodehealth.com.
+  (co-first author, Journal of Gastroenterology and Hepatology, 2026);
+  kosmodehealth.com.
 - **Research:** research staff at the NUS Yong Loo Lin School of Medicine since
   2024, working on UK Biobank and All of Us genomics, national registry studies and
   liver-imaging AI. Six peer-reviewed papers in 2026.
 - **Medtech:** FreeStryde, a wearable that recreates manual lymphatic drainage for
-  lymphedema (IDEATE 2025 Champion, EIC 2026 Merit Award, EDIC INSPIRE 2026 Most
-  Impactful Project), and KneedIt, a smart knee sleeve (Nokia–ARPA AgeWell 2026
-  finalist).
+  lymphedema (IDEATE 2025 Champion, EDIC INSPIRE 2026 Most Impactful Project), and
+  KneedIt, a smart knee sleeve.
 
 ## Links
 
@@ -75,15 +74,15 @@ the Experience timeline in `src/content/siteContent.tsx`.
 
 ### National University of Singapore
 
-- **Undergraduate Researcher (REx Fellow)** (Part-time), May 2026 – Present · 7 mos
+- **Machine Learning Researcher (REx Fellow)** (Part-time), May 2026 – Present
   (Digital Heart Lab, NUS Biomedical Engineering · On-site)
   - Two-stage pipeline for the MICCAI CARE-Liver challenge, funded by a CDE REx Fellows' Grant
   - First-author paper in press, MICCAI 2026 Satellite Events (Lecture Notes in Computer Science)
 
 ### NUS Yong Loo Lin School of Medicine
-5 yrs 5 mos
+Jul 2021 – Present
 
-- **Research Staff** (Part-time), Jun 2024 – Present · 2 yrs 6 mos (MD1, E7 · On-site)
+- **Research Staff** (Part-time), Jun 2024 – Present (MD1, E7 · On-site)
 - **Cardiothoracic and Vascular Surgery Intern** (Full-time), May 2022 · 1 mo
   (National University Hospital (NUH) · On-site)
   - Daily rounds across inpatient dialysis centres, ICUs, private and subsidised wards, managing
@@ -110,7 +109,7 @@ Full-time · 4 mos · On-site
 ### KosmodeHealth Singapore
 Part-time · 9 mos · Curie · Hybrid
 
-- **UI/UX Designer**, Mar 2025 – Oct 2025 · 8 mos
+- **UI/UX Designer & Front-End Developer**, Mar 2025 – Oct 2025 · 8 mos
   - Designed the public website (kosmodehealth.com) for an NUS deep-tech nutrition and biomedical
     startup
 - **Business Development Intern**, Feb 2025 – Mar 2025 · 2 mos
@@ -181,21 +180,14 @@ Part-time · 9 mos · Curie · Hybrid
 
 - **KneedIt: Smart Knee Sleeve and Companion App** (May 2026 – present, NUS) — Sleeve tracking range
   of motion, EMG and PPG with LED feedback; Next.js companion app that locks the phone past a
-  screen-time threshold until a guided exercise session is verified; caregiver dashboard. Finalist,
-  Nokia–ARPA Student AgeWell Healthtech Challenge 2026 (ICBME 2026). Live: kneed-it2.vercel.app
+  screen-time threshold until a guided exercise session is verified; caregiver dashboard.
+  Live: kneed-it2.vercel.app
 - **FreeStryde: Lymphedema Therapy Wearable** (Aug 2025 – present, NUS) — Dual-plane pneumatic
   mechanism that recreates the tangential skin stretch of manual lymphatic drainage. Awards: IDEATE
-  2025 Champion (S$10,000 NUS VIP Grant), Engineering Innovation Challenge 2026 Merit Award, EDIC
-  INSPIRE 2026 Most Impactful Project.
+  2025 Champion (S$10,000 NUS VIP Grant), EDIC INSPIRE 2026 Most Impactful Project.
 - **CARE-Liver: Liver Fibrosis Staging on Multi-Vendor MRI** (May 2026 – Aug 2026, Digital Heart Lab) —
   nnU-Net liver segmentation (Dice 0.97) feeding per-sequence 3D ResNets with missing-modality-robust
   late fusion. First-author paper in press, MICCAI 2026 Satellite Events.
-- **Kampung Echoes** (May 2026 – Aug 2026) — Phone web app that reconstructs the street in front of the
-  camera as it looked decades earlier, with narration. TypeScript on Agnes AI, The LaunchPad Challenge
-  2026 (Acacia AI Society). Live: kampung-echoes.vercel.app
-- **NAISC 2026: Adaptive Drift Intelligence (Singtel track)** (Apr 2026) — LightGBM churn classifier
-  with automated drift detection and mitigation, plus a Dockerised React dashboard.
-  Code: github.com/doux124/NASC
 - **Liver and Vascular Organoid Models of Steatosis** (Oct 2024 – May 2026, NUS BME) — Sirolimus
   cleared steatotic features in 3D hepatobiliary and vascular organoids. Published in Atherosclerosis.
 - **Project i'mPAC** (Nov 2021 – Dec 2022, NUS High) — Student-led COVID relief for Cambodian
@@ -220,7 +212,6 @@ Part-time · 9 mos · Curie · Hybrid
 - **Kosmode Health** — kosmodehealth.com
 - **NUS DE-Scholars** — nusdescholars.com
 - **KneedIt** — kneed-it2.vercel.app
-- **Kampung Echoes** — kampung-echoes.vercel.app
 - **Previous Portfolio** — doux124.github.io/jordan
 
 ## Publications
@@ -255,10 +246,6 @@ One line each, matching the site's Awards & Honours card.
 
 - **EDIC INSPIRE 2026 — Most Impactful Project (FreeStryde)** — NUS College of Design and
   Engineering, Nov 2026
-- **Nokia–ARPA Student AgeWell Healthtech Challenge 2026 — Finalist (KneedIt)** — NUS MedTech and
-  ICBME 2026, Nov 2026
-- **Engineering Innovation Challenge 2026 — Merit Award (FreeStryde)** — Institution of Engineers
-  Singapore, Aug 2026
 - **REx Fellow — CDE Undergraduate Research Experience Fellows' Grant (S$5,000)** — NUS College of
   Design and Engineering, Aug 2026
 - **Innovation & Research Award 2026 (High Achievement)** — NUS, Jun 2026
