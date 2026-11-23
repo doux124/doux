@@ -5,7 +5,9 @@
     <title>Jordan's Website</title>
     <script type="text/javascript">  
  
-      var pathSegmentsToKeep = 1;
+      // Project sites on github.io live under /<repo>/ and keep that segment;
+      // the custom domain (jordanlowjunyi.com) serves the app from the root.
+      var pathSegmentsToKeep = /\.github\.io$/.test(window.location.hostname) ? 1 : 0;
 
       var l = window.location;
       l.replace(
