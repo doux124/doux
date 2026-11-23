@@ -4,36 +4,31 @@
 
 > Source of record for the site's biographical content. The homepage reads its
 > copy from `src/content/siteContent.tsx`; this file is the human-readable
-> reference behind it (pasted from LinkedIn, July 2026).
+> reference behind it (synced with LinkedIn and the Nov 2026 CV, 23 Nov 2026).
 
 ## Summary
 
-Hi! I'm Jordan Low, a biomedical engineering student at NUS with a passion for
-research and innovation.
+I'm a Biomedical Engineering student at NUS (Engineering Scholars Programme) with a
+second major in Computing and a minor in AI, graduating in 2027. I build
+machine-learning and web software for healthcare.
 
-My research experience spans multiple cutting-edge projects, including inventing
-a novel biomedical device for minimally invasive annuloplasties, developing blood
-glucose monitors, and improving brain-computer interface technologies. These
-innovations have led to patents, publications, and recognition through awards like
-the Top Prize at the Global Youth Science and Technology Bowl, a Gold Award at the
-Singapore Science and Engineering Fair, and the prestigious Tan Kah Kee Young
-Inventor's Award.
-
-My academic foundation is rooted in a deep love for the sciences. As a graduate of
-NUSH, I was the only student to earn Triple Distinction with Honours in Chemistry,
-Biology, and Physics, and I've been honored with Gold Medals in competitions such
-as the International Chemistry Tournament and the Singapore Chemistry Olympiad.
-
-I've also gained practical experience through internships at labs like NUS's E6
-Nanofab and NIE's Plasma Engineering Lab, as well as hands-on training in
-cardiothoracic and vascular surgery at NUH. Beyond academics, I actively volunteer
-in nursing homes and hospices across Singapore, and am the Overall In Charge for
-Project IMPAC, where we lead overseas humanitarian relief efforts for underprivileged
-communities.
+- **Software and machine learning:** CARE-Liver, a deep-learning pipeline that
+  segments the liver on MRI with nnU-Net (Dice 0.97) and stages fibrosis across
+  scanner vendors (first-author paper in press, MICCAI 2026 Satellite Events); liver
+  ultrasound AI that estimates liver fat and stiffness from plain ultrasound
+  (co-first author, Journal of Gastroenterology and Hepatology, 2026); Kampung
+  Echoes; NAISC 2026; kosmodehealth.com.
+- **Research:** research staff at the NUS Yong Loo Lin School of Medicine since
+  2024, working on UK Biobank and All of Us genomics, national registry studies and
+  liver-imaging AI. Six peer-reviewed papers in 2026.
+- **Medtech:** FreeStryde, a wearable that recreates manual lymphatic drainage for
+  lymphedema (IDEATE 2025 Champion, EIC 2026 Merit Award, EDIC INSPIRE 2026 Most
+  Impactful Project), and KneedIt, a smart knee sleeve (Nokia–ARPA AgeWell 2026
+  finalist).
 
 ## Links
 
-- LinkedIn: https://www.linkedin.com/in/jordan-low-jun-yi-69a150279/
+- LinkedIn: https://www.linkedin.com/in/jordan-low-jun-yi
 - Google Scholar: https://scholar.google.com/citations?hl=en&user=O6M8clAAAAAJ
 - Digital Heart Lab profile: https://digitalheartlab.com/people/jordan_low
 - GitHub: https://github.com/doux124
@@ -46,10 +41,13 @@ Aug 2025 – Aug 2027
 - Computing (Design & Engineering) — Second Major
 - Artificial Intelligence — First Minor
 - Innovation and Design — Second Minor
-- Tissue Engineering — First Specialization
-- Robotics — Second Specialization
+- Tissue Engineering — Specialization
 
-**Residential College 4 (RC4)** — Aug 2025 – Aug 2027 (Aquila House Committee, Programmes Committee)
+**Residential College 4 (RC4)** — Aug 2025 – Aug 2027 (Programmes Committee, House of Aquila;
+Vice Head, RC4 Tea; Treasurer, Orcabakes)
+
+### University of Illinois Urbana-Champaign — Exchange
+Spring 2027 (January to May 2027)
 
 ### NUS — Non-Graduating Program
 Aug 2021 – Aug 2025 · Grade: Distinction
@@ -75,16 +73,17 @@ Dec 2025 – Jan 2026 · Engineering Ethics, Korean Language
 Grouped by organisation, so multiple roles at the same institution stay together. This mirrors
 the Experience timeline in `src/content/siteContent.tsx`.
 
-### Agency for Science, Technology and Research (A*STAR)
-Full-time · 3 mos · On-site
+### National University of Singapore
 
-- **Innovation and Enterprise Intern**, May 2026 – Present · 3 mos (Kinesis, Innovis)
-- **Institute of Molecular and Cell Biology Intern**, May 2026 – Present · 3 mos (Proteos)
+- **Undergraduate Researcher (REx Fellow)** (Part-time), May 2026 – Present · 7 mos
+  (Digital Heart Lab, NUS Biomedical Engineering · On-site)
+  - Two-stage pipeline for the MICCAI CARE-Liver challenge, funded by a CDE REx Fellows' Grant
+  - First-author paper in press, MICCAI 2026 Satellite Events (Lecture Notes in Computer Science)
 
 ### NUS Yong Loo Lin School of Medicine
-5 yrs 1 mo
+5 yrs 5 mos
 
-- **Research Staff** (Part-time), Jun 2024 – Present · 2 yrs 2 mos (MD1, E7 · On-site)
+- **Research Staff** (Part-time), Jun 2024 – Present · 2 yrs 6 mos (MD1, E7 · On-site)
 - **Cardiothoracic and Vascular Surgery Intern** (Full-time), May 2022 · 1 mo
   (National University Hospital (NUH) · On-site)
   - Daily rounds across inpatient dialysis centres, ICUs, private and subsidised wards, managing
@@ -100,6 +99,14 @@ Full-time · 3 mos · On-site
   - Biodegradable MMA-PEGDMA rings for paediatric cardiac applications
   - Skills: Materials Science, Data Analysis, +2 skills
 
+### Agency for Science, Technology and Research (A*STAR)
+Full-time · 4 mos · On-site
+
+- **Innovation and Enterprise Intern**, May 2026 – Aug 2026 · 4 mos (Kinesis, Innovis)
+  - Testimonial by David Sher, Deputy Director, Venture Creation & Market Access:
+    `public/testimonials/ASTAR_Testimonial_Jordan_Low.pdf`
+- **Institute of Molecular and Cell Biology Intern**, May 2026 – Aug 2026 · 4 mos (Proteos)
+
 ### KosmodeHealth Singapore
 Part-time · 9 mos · Curie · Hybrid
 
@@ -112,7 +119,7 @@ Part-time · 9 mos · Curie · Hybrid
 
 ### MDS-Plus
 
-- **Mechanical Designer Intern** (Full-time), Nov 2024 – Feb 2025 · 4 mos
+- **Mechanical Designer Intern** (Full-time), Dec 2024 – Feb 2025 · 3 mos
   (79 Ayer Rajah Crescent · On-site)
   - Skills: SOLIDWORKS, Python
   - Testimonial by Lim Eng Seng, Founder and Principal Engineer:
@@ -172,6 +179,25 @@ Part-time · 9 mos · Curie · Hybrid
 
 ## Projects
 
+- **KneedIt: Smart Knee Sleeve and Companion App** (May 2026 – present, NUS) — Sleeve tracking range
+  of motion, EMG and PPG with LED feedback; Next.js companion app that locks the phone past a
+  screen-time threshold until a guided exercise session is verified; caregiver dashboard. Finalist,
+  Nokia–ARPA Student AgeWell Healthtech Challenge 2026 (ICBME 2026). Live: kneed-it2.vercel.app
+- **FreeStryde: Lymphedema Therapy Wearable** (Aug 2025 – present, NUS) — Dual-plane pneumatic
+  mechanism that recreates the tangential skin stretch of manual lymphatic drainage. Awards: IDEATE
+  2025 Champion (S$10,000 NUS VIP Grant), Engineering Innovation Challenge 2026 Merit Award, EDIC
+  INSPIRE 2026 Most Impactful Project.
+- **CARE-Liver: Liver Fibrosis Staging on Multi-Vendor MRI** (May 2026 – Aug 2026, Digital Heart Lab) —
+  nnU-Net liver segmentation (Dice 0.97) feeding per-sequence 3D ResNets with missing-modality-robust
+  late fusion. First-author paper in press, MICCAI 2026 Satellite Events.
+- **Kampung Echoes** (May 2026 – Aug 2026) — Phone web app that reconstructs the street in front of the
+  camera as it looked decades earlier, with narration. TypeScript on Agnes AI, The LaunchPad Challenge
+  2026 (Acacia AI Society). Live: kampung-echoes.vercel.app
+- **NAISC 2026: Adaptive Drift Intelligence (Singtel track)** (Apr 2026) — LightGBM churn classifier
+  with automated drift detection and mitigation, plus a Dockerised React dashboard.
+  Code: github.com/doux124/NASC
+- **Liver and Vascular Organoid Models of Steatosis** (Oct 2024 – May 2026, NUS BME) — Sirolimus
+  cleared steatotic features in 3D hepatobiliary and vascular organoids. Published in Atherosclerosis.
 - **Project i'mPAC** (Nov 2021 – Dec 2022, NUS High) — Student-led COVID relief for Cambodian
   students; soap and mask-making workshops with LJ Cambodia Foundation and ISE Travel.
 - **Minimally Invasive Annuloplasty using Shape Memory Materials** (Jul 2021 – May 2022, NUS YLL) —
@@ -194,15 +220,27 @@ Part-time · 9 mos · Curie · Hybrid
 - **Kosmode Health** — kosmodehealth.com
 - **NUS DE-Scholars** — nusdescholars.com
 - **KneedIt** — kneed-it2.vercel.app
+- **Kampung Echoes** — kampung-echoes.vercel.app
 - **Previous Portfolio** — doux124.github.io/jordan
 
 ## Publications
 
+- **Added effects of manual lymphatic drainage and intermittent pneumatic compression on
+  compression-based care for established upper-limb breast-cancer-related lymphedema: a systematic
+  review and component network meta-analysis** — *Supportive Care in Cancer*, Nov 19, 2026
+  (first author)
+  - doi.org/10.1007/s00520-026-11494-0
+- **Integrating plain 2D ultrasound and clinical data for identification of at-risk MASH: a
+  multicenter proof of concept study** — *Journal of Gastroenterology and Hepatology*, Oct 16, 2026
+  (co-first author)
+  - doi.org/10.1111/jgh.70763
+- **A transfer-learned segmentation-to-staging cascade for robust liver fibrosis staging on
+  real-world multi-vendor MRI** — *MICCAI 2026 Satellite Events (LNCS)*, in press (first author)
 - **Prognosis of patients with ST-elevation myocardial infarction presenting to the emergency
   department without chest pain: a retrospective nationwide cohort study** — *Heart*, Jun 19, 2026
   - doi.org/10.1136/heartjnl-2025-327601 (PMID 42315345)
 - **Diversity in metabolic dysfunction-associated steatotic liver disease: a framework for precision
-  medicine** — *npj Gut and Liver*, Jun 4, 2026
+  medicine** — *npj Gut and Liver*, Jun 4, 2026 (co-first author)
   - doi.org/10.1038/s44355-026-00061-3
 - **Fibro-inflammatory liver injury, not steatosis, predicts incident composite neuropsychiatric
   events and mortality in the UK Biobank** — *Metabolism*, May 21, 2026
@@ -215,11 +253,23 @@ Part-time · 9 mos · Curie · Hybrid
 
 One line each, matching the site's Awards & Honours card.
 
-- **Innovation & Research Award 2026 (High Achievement)** — 2026
-- **IDEATE 2025 — Champion** — NUS, Oct 2025
+- **EDIC INSPIRE 2026 — Most Impactful Project (FreeStryde)** — NUS College of Design and
+  Engineering, Nov 2026
+- **Nokia–ARPA Student AgeWell Healthtech Challenge 2026 — Finalist (KneedIt)** — NUS MedTech and
+  ICBME 2026, Nov 2026
+- **Engineering Innovation Challenge 2026 — Merit Award (FreeStryde)** — Institution of Engineers
+  Singapore, Aug 2026
+- **REx Fellow — CDE Undergraduate Research Experience Fellows' Grant (S$5,000)** — NUS College of
+  Design and Engineering, Aug 2026
+- **Innovation & Research Award 2026 (High Achievement)** — NUS, Jun 2026
+- **IDEATE 2025 — Champion (FreeStryde)** — NUS, Oct 2025 (out of 80+ teams; S$10,000 NUS VIP Grant)
+- **WorldQuant BRAIN Alphathon 2024 — 6th Place** — WorldQuant, Sep 2024
+- **Triple Distinction with Honours (Chemistry, Biology, Physics)** — NUS High School, 2022 (the only
+  student in the cohort)
 - **Tan Kah Kee Young Inventors' Award (TKKYIA) — Silver** — Tan Kah Kee Foundation, Jul 2022
 - **Global Youth Science and Technology Bowl (GYSTB) — Grand Prize (Gold)** — The Hong Kong
   Federation of Youth Groups, May 2022
+- **Japan Super Science Fair — Invitation (shape-memory annuloplasty)** — 2022
 - **International Elementz Fair (IEF) — Gold** — NTU, Apr 2022
 - **Singapore Science and Engineering Fair (SSEF) — Gold** — SSEF, Mar 2022
 - **Singapore Science and Engineering Fair (SSEF) — Silver** — SSEF, Mar 2022
@@ -227,8 +277,10 @@ One line each, matching the site's Awards & Honours card.
 - **National Robotics Competition — 2nd Runner Up** — Science Centre Singapore, Sep 2021
 - **International Chemistry Tournament (IChTo) — Champion** — IChTo, Aug 2021
 - **Singapore Chemistry Olympiad (SChO) — Gold** — Singapore National Institute of Chemistry, Jul 2021
+- **NUS Chemical Engineering Challenge — 2nd Runner-Up** — NUS, 2021
 - **A*STAR Science Award (Junior College)** — A*STAR Singapore, Jan 2021
 - **UK Intermediate Biology Olympiad — Gold** — UK Biology Competitions, Mar 2020
+- **International Science Youth Forum — Invitation (graphene biosensing)** — 2020
 - **Singapore Junior Biology Olympiad (SJBO) — Gold** — May 2019
 - **Singapore Junior Chemistry Olympiad (SJChO) — Gold** — May 2019
 - **UK Biology Challenge — Gold** — UK Biology Competitions, Mar 2019
