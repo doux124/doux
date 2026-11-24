@@ -283,3 +283,22 @@ One line each, matching the site's Awards & Honours card.
 - **Volunteer** — Active Aging Advocates, Jan 2023 – Dec 2023
 - **Volunteer** — All Saints Home, Mar 2022 – Sep 2022
 - **Volunteer** — Fei Yue, Aug 2024 – Oct 2025
+
+## Testimonials
+
+Excerpts, word for word, from the letters linked under Experience.
+
+- "Taking on dual roles is demanding for anyone, and Jordan handled both well beyond what I expect
+  from an intern." — David Sher, Deputy Director, Venture Creation & Market Access, A*STAR
+- "He demonstrated an exceptional ability to tackle complex engineering challenges with creativity,
+  precision, and dedication." — Lim Eng Seng, Founder and Principal Engineer, MDS-Plus
+- "Throughout the internship, Jordan demonstrated a ‘Can-do’ mentality, the courage to undertake
+  challenges and resolve problems, a sense of purpose. In short - a maturity beyond his age."
+  — Florence Leong, Founder and Director, KosmodeHealth
+- "A self-motivated and efficient individual, Jordan managed his responsibilities with minimal
+  supervision." — Lim Eng Seng, Founder and Principal Engineer, MDS-Plus
+- "Working with no financial budget and tight time constraints during academic term, Jordan
+  successfully revamped KosmodeHealth's corporate website." — Florence Leong, Founder and Director,
+  KosmodeHealth
+- "Any team would be fortunate to have him, and I expect him to make a real contribution wherever he
+  lands next." — David Sher, Deputy Director, Venture Creation & Market Access, A*STAR
